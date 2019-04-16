@@ -24,7 +24,10 @@ void main ()
                         SYSTEM_GC_SERVER : "false",
                         SYSTEM_GLOBALISATION_INVARIANT : "false"
                      ]);
+
+    // Doesn't work, coreclr_initialize returns EINVALID_ARG
     writeln("clrhost= ",clrhost);
+
     auto a = new CLRWrapper!ManLib;
     {
         auto b = a.Bootstrap();
