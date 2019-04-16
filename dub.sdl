@@ -1,0 +1,6 @@
+name "dflat"
+description "C#/.Net wrapper"
+authors "Nicholas Wilson"
+copyright "Copyright © 2019, Nicholas Wilson"
+license "proprietary"
+dependency "derelict-util" version="~>2.1.0"
