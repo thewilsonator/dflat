@@ -4,3 +4,13 @@ authors "Nicholas Wilson"
 copyright "Copyright © 2019, Nicholas Wilson"
 license "proprietary"
 dependency "derelict-util" version="~>2.1.0"
+
+configuration "library" {
+    targetType "library"
+    sourcePaths "source"
+}
+configuration "unittest" {
+    targetType "executable"
+    preBuildCommands "cd test/manlib && dotnet build; cd ../../"
+    sourcePaths "source" "test"
+}
