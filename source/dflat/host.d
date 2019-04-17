@@ -29,7 +29,7 @@ string TrustedPlatformAssembliesFiles(string dir = dirName(dflat.bind.libNames))
         "*.dll",    // if ni and il coexist in the same dir
         "*.ni.exe", // ditto
         "*.exe",
-        "*.dylib"];
+        ];
     import std.array;
     Appender!string ret;
     byte[string] asms;
