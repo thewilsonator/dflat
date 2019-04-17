@@ -65,22 +65,17 @@ struct CLRHost
         import std.array;
         import std.string;
 
-        //writeln("exePath: ",exePath);
-        //writeln(name);
-        //writeln(props);
         int len = cast(int)props.length;
         auto keys = props.keys.map!(toStringz).array;
         auto vals = props.values.map!(toStringz).array;
-        //writeln(keys.ptr, " ", vals.ptr);
-        //writefln("%x",
-            coreclr_initialize(exePath.toStringz,
+
+        coreclr_initialize(exePath.toStringz,
                            name.toStringz,
                            len,
                            keys.ptr,
                            vals.ptr,
                            &handle,
                            &domainId)
-            //)
             ;
     }
     void shutdown()
