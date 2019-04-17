@@ -1,6 +1,4 @@
-import dflat.wrap;
-import dflat.bind;
-import dflat.host;
+import dflat;
 
 @DLL("manlib")
 abstract class ManLib
@@ -13,11 +11,12 @@ void main ()
     import std.stdio;
     CLRCore.load();
     import std.file;
-    string path = getcwd()~"/cs/bin/Debug/netstandard2.0/";
+    string path = getcwd()~"/test/manlib/bin/Debug/netstandard2.0/";
     string ep = thisExePath();
     clrhost = CLRHost(getcwd(),"foo",
                      [
-                        TRUSTED_PLATFORM_ASSEMBLIES : TrustedPlatformAssembliesFiles() ~":"~path~"cs.dll",
+                        TRUSTED_PLATFORM_ASSEMBLIES :
+                            pathcat(TrustedPlatformAssembliesFiles(), path~"cs.dll"),
                         APP_PATHS : path,
                         APP_NI_PATHS : path,
                         NATIVE_DLL_SEARCH_DIRECTORIES : path,
@@ -25,13 +24,13 @@ void main ()
                         SYSTEM_GLOBALISATION_INVARIANT : "false"
                      ]);
 
-    // Doesn't work, coreclr_initialize returns EINVALID_ARG
-    writeln("clrhost= ",clrhost);
+    writeln("clrhost = ",clrhost);
 
     auto a = new CLRWrapper!ManLib;
     {
+        import std.string : fromStringz;
         auto b = a.Bootstrap();
-        writeln(b);
+        writeln(b.fromStringz);
     }
     clrhost.shutdown();
 }
