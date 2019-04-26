@@ -43,6 +43,15 @@ T1: D ---- C# -- D ---------
 T2:        -> C# ---- { } --
 ``
 
+From https://github.com/dotnet/coreclr/blob/master/Documentation/coding-guidelines/clr-code-guide.md
+
+Put precisely: as long as a thread is in cooperative mode, it is guaranteed that a 
+GC will only occur when your thread triggers an object allocation, calls out to interruptible 
+managed code or explicitly requests a GC. All other threads are blocked from GC. As long as 
+your thread is in preemptive mode, then you must assume that a GC can be started any time 
+(by some other thread) and is running concurrently with your thread.
+
+
 # Current Strategy:
 
 * disable the D GC when calling C#
