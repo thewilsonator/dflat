@@ -1,0 +1,4 @@
+/Users/nicholaswilson/d/dflat/csreflect/obj/Debug/netcoreapp2.2/dflat.csprojAssemblyReference.cache
+/Users/nicholaswilson/d/dflat/csreflect/obj/Debug/netcoreapp2.2/dflat.csproj.CoreCompileInputs.cache
+/Users/nicholaswilson/d/dflat/csreflect/obj/Debug/netcoreapp2.2/dflat.AssemblyInfoInputs.cache
+/Users/nicholaswilson/d/dflat/csreflect/obj/Debug/netcoreapp2.2/dflat.AssemblyInfo.cs
