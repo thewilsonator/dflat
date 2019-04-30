@@ -15,6 +15,12 @@ struct Entrypoint
     string entrypoint;
 }
 
+enum MethodType
+{
+    static_,
+    nonstatic
+}
+
 struct CLRAllocatedCString
 {
     char* ptr;
