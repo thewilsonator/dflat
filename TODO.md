@@ -11,3 +11,12 @@
         - Need VARENUM otherwise use `core.sys.windows.oleauto`
     - Instances
     - GC contention and pinning logic
+* `Instance!("IntPtr")` should be `void*`
+
+# Things to not care about
+
+* Math operator overloads
+* GetType
+* Genereic Methods (`Instance!("T")`)
+* DynamicInvoke
+* implicit casts (`op_Implicit`)
