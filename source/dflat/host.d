@@ -23,13 +23,12 @@ import std.algorithm;
 import std.range;
 string TrustedPlatformAssembliesFiles(string dir = dirName(dflat.bind.libNames))
 {
-    //writeln("dir: ", dir);
     immutable exts = [
         "*.ni.dll", // Probe for .ni.dll first so that it's preferred
         "*.dll",    // if ni and il coexist in the same dir
         "*.ni.exe", // ditto
         "*.exe",
-        ];
+    ];
     import std.array;
     Appender!string ret;
     byte[string] asms;
@@ -37,7 +36,6 @@ string TrustedPlatformAssembliesFiles(string dir = dirName(dflat.bind.libNames))
 
     foreach(ex; exts)
     foreach(f;dirEntries(dir,ex, SpanMode.shallow))
-        //.tee!((e) => writeln("file :",e))
     {
         if (!f.isFile) continue;
 
@@ -101,7 +99,6 @@ struct CLRHost
     {
         void* dg;
 
-        //writeln(entryPointAssemblyName, "\t",entryPointTypeName, "\t", entryPointMethodName);
         coreclr_create_delegate(handle, domainId,
                                 entryPointAssemblyName.toStringz,
                                 entryPointTypeName.toStringz,
