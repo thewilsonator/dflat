@@ -21,6 +21,14 @@ enum MethodType
     nonstatic
 }
 
+struct DotNetObject { void * p; }
+// For objects
+struct Instance(string fullClsName)
+{
+    DotNetObject o;
+    alias o this;
+}
+
 struct CLRAllocatedCString
 {
     char* ptr;
