@@ -238,7 +238,7 @@ class CLRBuilder
         else if (type.IsArray)
         {
             //N.B. the marshaller can't handle nested (i.e. jagged) arrays. 
-            return "SafeArray!(" + toDType(type.GetElementType()) + "," + type.GetArrayRank().ToString() + ")*";
+            return "SafeArray!(" + toDType(type.GetElementType()) + "," + type.GetArrayRank().ToString() + ")";
         }
         else if (type.IsByRef)
         {
