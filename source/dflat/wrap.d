@@ -21,6 +21,7 @@ template how(C,alias fun)
     import std.string : format;
     enum string dll = getUDAs!(C,DLL)[0].dll;
     enum how = q{
+        import %s;
         alias func = %s function%s;
         import core.gc;
         // Avoid the GC stopping a running C# thread.
@@ -30,7 +31,12 @@ template how(C,alias fun)
         %s,
         %s));
         return f();
-    }.format(ReturnType!(fun).stringof,
+    }.format(
+        moduleName!C,
+
+        /*possibly need to use partially qualified name if this gets too slow*/
+        fullyQualifiedName!(ReturnType!(fun)),
+
         Parameters!(fun).stringof,
         dll,
         __traits(identifier, C).stringof,
