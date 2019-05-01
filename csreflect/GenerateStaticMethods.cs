@@ -110,7 +110,7 @@ class CLRBuilder
             sw.Write("\t@MethodType.static_ ");
         else
             sw.Write("\t@MethodType.nonstatic ");
-        sw.Write(toDType(mi.ReturnType)) + " " + mi.Name);
+        sw.Write(toDType(mi.ReturnType) + " " + mi.Name);
         sw.Write("( ");
         if (mi.IsStatic)
         {
@@ -184,7 +184,7 @@ class CLRBuilder
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("Free"));
         }
         {
-            sw.Write("\t@MethodType.static_ " + toDType(t))+ " ___ctor(");
+            sw.Write("\t@MethodType.static_ " + toDType(t) + " ___ctor(");
             if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
                 {
                     sw.Write(toDType(pt));
