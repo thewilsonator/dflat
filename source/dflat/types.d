@@ -17,13 +17,17 @@ struct CLRAllocatedCString
 
     ~this()
     {
-        import core.stdc.stdlib : free;
         if (ptr)
         {
             version(Windows)
+            {
+                import core.sys.windows.objbase : CoTaskMemFree;
                 CoTaskMemFree(ptr);
             else
+            {
+                import core.stdc.stdlib : free;
                 free(ptr);
+            }
         }
     }
 
