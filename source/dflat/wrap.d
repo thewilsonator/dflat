@@ -43,29 +43,6 @@ template how(C,alias fun)
         __traits(identifier, fun).stringof);
 }
 
-/*
-// C# in dll manlib
-public class ManLib
-{
-    // "Note that String became char *, according to the default C# marshaling rules.
-    // You can also customize the marshaling as needed using [MarshalAsAttribute]".
-    // TODO handle other marshalling
-
-    public static string Bootstrap()
-    {
-        return "Bootstrap!";
-    }
-}
-
-->
-// D
-@DLL("manlib")
-abstract class ManLib
-{
-    CLRAllocatedCString Bootstrap();
-}
-*/
-
 template CLRWrapper(C) if (getUDAs!(C,DLL).length == 1)
 {
     alias CLRWrapper = AutoImplement!(C, how);
