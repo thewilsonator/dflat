@@ -23,6 +23,7 @@ struct CLRAllocatedCString
             {
                 import core.sys.windows.objbase : CoTaskMemFree;
                 CoTaskMemFree(ptr);
+            }
             else
             {
                 import core.stdc.stdlib : free;
