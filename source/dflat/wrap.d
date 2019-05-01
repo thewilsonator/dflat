@@ -10,9 +10,9 @@ struct DLL
 }
 
 // ditto
-struct Entrypoint
+struct NameSpace
 {
-    string entrypoint;
+    string NameSpace;
 }
 
 template how(C,alias fun)
