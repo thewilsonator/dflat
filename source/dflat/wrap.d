@@ -15,38 +15,6 @@ struct Entrypoint
     string entrypoint;
 }
 
-
-struct DotNetObject { void * p; }
-// For objects
-struct Instance(string fullClsName)
-{
-    DotNetObject o;
-    alias o this;
-}
-
-struct CLRAllocatedCString
-{
-    char* ptr;
-    
-    ~this()
-    {
-        import core.stdc.stdlib : free;
-        if (ptr)
-        {
-            version(Windows)
-                CoTaskMemFree(ptr);
-            else
-                free(ptr);
-        }
-    }
-    
-    char* wipeAndKeep()
-    {
-        char* tmp = ptr;
-        ptr = null;
-        return tmp;
-    }
-}
 template how(C,alias fun)
 {
     import std.traits;
