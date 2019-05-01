@@ -131,7 +131,7 @@ class CLRBuilder
 
         }
         {
-            sw.Write("\t" toDType(mi.ReturnType) + " " + mi.Name);
+            sw.Write("\t" + toDType(mi.ReturnType) + " " + mi.Name);
             sw.Write("( ");
             if (mi.IsStatic)
             {
