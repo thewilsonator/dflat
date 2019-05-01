@@ -97,39 +97,65 @@ class CLRBuilder
                                            mi.ReturnType,
                                            tps
                                            );
-        ILGenerator ilg = mb.GetILGenerator();
-
-        for (byte x = 0; x < tps.Length; x++)
         {
-            ilg.Emit(OpCodes.Ldarg_S, x);
-        }
-        ilg.Emit(OpCodes.Callvirt, mi);
-        ilg.Emit(OpCodes.Ret);
-
-        if (mi.IsStatic)
-            sw.Write("\t@MethodType.static_ ");
-        else
-            sw.Write("\t@MethodType.nonstatic ");
-        sw.Write(toDType(mi.ReturnType) + " " + mi.Name);
-        sw.Write("( ");
-        if (mi.IsStatic)
-        {
-            if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
+            ILGenerator ilg = mb.GetILGenerator();
+            ilg.Emit(OpCodes.Nop);
+            if (mi.IsStatic)
+            {
+                for (byte x = 0; x < tps.Length; x++)
                 {
-                    sw.Write(toDType(pt));
-                    sw.Write(", ");
+                    ilg.Emit(OpCodes.Ldarg_S, x);
                 }
-            if ((tps.Length > 1))
-                sw.Write(toDType(tps[tps.Length - 1]));
-        }
-        else
-        {
-            sw.Write(toDType(tps[0])); sw.Write(" ");
-            if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length))
+                ilg.Emit(OpCodes.Call, mi);
+            }
+            else
+            {
+                ilg.Emit(OpCodes.Ldarg_0);
+                ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("FromIntPtr"));
+                ilg.Emit(OpCodes.Stloc_0);
+                ilg.Emit(OpCodes.Ldloc_0);
+                ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("get_Target"));
+                ilg.Emit(OpCodes.Stloc_1);
+                ilg.Emit(OpCodes.Ldloc_1);
+                ilg.Emit(OpCodes.Castclass, t);
+                ilg.Emit(OpCodes.Stloc_2);
+                ilg.Emit(OpCodes.Ldloc_2);
+                for (byte x = 1; x < tps.Length; x++)
                 {
-                    sw.Write(", ");
-                    sw.Write(toDType(pt));
+                    ilg.Emit(OpCodes.Ldarg_S, x);
                 }
+                ilg.Emit(t.IsSealed ? OpCodes.Call : OpCodes.Callvirt, mi);
+            }
+            ilg.Emit(OpCodes.Nop);
+            ilg.Emit(OpCodes.Ret);
+
+        }
+        {
+            if (mi.IsStatic)
+                sw.Write("\t@MethodType.static_ ");
+            else
+                sw.Write("\t@MethodType.nonstatic ");
+            sw.Write(toDType(mi.ReturnType) + " " + mi.Name);
+            sw.Write("( ");
+            if (mi.IsStatic)
+            {
+                if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
+                    {
+                        sw.Write(toDType(pt));
+                        sw.Write(", ");
+                    }
+                if ((tps.Length > 1))
+                    sw.Write(toDType(tps[tps.Length - 1]));
+            }
+            else
+            {
+                sw.Write(toDType(tps[0])); sw.Write(" ");
+                if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length))
+                    {
+                        sw.Write(", ");
+                        sw.Write(toDType(pt));
+                    }
+            }
         }
 
         sw.Write(");\n");
