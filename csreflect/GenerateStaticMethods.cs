@@ -54,8 +54,8 @@ class CLRBuilder
             tb = mb.DefineType(t.Name + "Static", TypeAttributes.Public);
             foreach (MemberInfo mi in t.GetMembers())
             {
-            	if (mi.Name == "assert")
-            		continue;
+                if (mi.Name == "assert")
+                    continue;
 
                 if (mi.MemberType == MemberTypes.Method)
                     addMethod((MethodInfo)mi);
