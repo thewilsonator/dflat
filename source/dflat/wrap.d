@@ -59,6 +59,10 @@ template how(C,alias fun)
     enum string dll = getUDAs!(C,DLL)[0].dll;
     enum how = q{
         alias func = %s function%s;
+        import core.gc;
+        // Avoid the GC stopping a running C# thread.
+        GC.disable; scope(exit) GC.enable;
+
         auto f = cast(func)(clrhost.create_delegate("%s",
         %s,
         %s));
