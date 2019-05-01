@@ -162,13 +162,22 @@ class CLRBuilder
                                            );
             ILGenerator ilg = mb.GetILGenerator();
 
+            // Copy what ildasm says csc does modulo redundant direct branches
+            ilg.Emit(OpCodes.Nop);
+
             for (byte x = 0; x < tps.Length; x++)
             {
                 ilg.Emit(OpCodes.Ldarg_S, x);
             }
             ilg.Emit(OpCodes.Newobj, ci);
+            ilg.Emit(OpCodes.Stloc_0);
+            ilg.Emit(OpCodes.Ldloc_0);
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("Alloc", new[] { typeof(Object) }));
+            ilg.Emit(OpCodes.Stloc_1);
+            ilg.Emit(OpCodes.Ldloc_1);
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("ToIntPtr"));
+            ilg.Emit(OpCodes.Stloc_2);
+            ilg.Emit(OpCodes.Ldloc_2);
             ilg.Emit(OpCodes.Ret);
         }
         {
@@ -179,9 +188,14 @@ class CLRBuilder
                                            new[] { typeof(IntPtr) }
                                            );
             ILGenerator ilg = mb.GetILGenerator();
+            ilg.Emit(OpCodes.Nop);
             ilg.Emit(OpCodes.Ldarg_0);
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("FromIntPtr"));
+            ilg.Emit(OpCodes.Stloc_0);
+            ilg.Emit(OpCodes.Ldloc_0);
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("Free"));
+            ilg.Emit(OpCodes.Nop);
+            ilg.Emit(OpCodes.Ret);
         }
         {
             sw.Write("\t@MethodType.static_ " + toDType(t) + " ___ctor(");
