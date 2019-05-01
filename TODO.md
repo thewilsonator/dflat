@@ -3,7 +3,6 @@
 * Saving generated DLL only works on windows 
     - look into https://github.com/Lokad/ILPack
 * Add support for namespaces
-* Update to using `$ClassName ~ "Static"`
 * Testing
     - SafeArray desctiptor stuff (Urgh)
         - Need VARENUM otherwise use `core.sys.windows.oleauto`
