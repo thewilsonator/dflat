@@ -197,7 +197,9 @@ class CLRBuilder
     }
     static string toDType(Type type)
     {
-        if (type.IsArray)
+        if (type == typeof(IntPtr))
+            return "void*";
+        else if (type.IsArray)
         {
             //N.B. the marshaller can't handle nested (i.e. jagged) arrays. 
             return "SafeArray!(" + toDType(type.GetElementType()) + "," + type.GetArrayRank().ToString() + ")*";

@@ -10,7 +10,6 @@
         - Need VARENUM otherwise use `core.sys.windows.oleauto`
     - Instances
     - GC contention and pinning logic
-* `Instance!("IntPtr")` should be `void*`
 
 # Things to not care about improving
 
