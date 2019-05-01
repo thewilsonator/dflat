@@ -15,11 +15,6 @@ struct Entrypoint
     string entrypoint;
 }
 
-enum MethodType
-{
-    static_,
-    nonstatic
-}
 
 struct DotNetObject { void * p; }
 // For objects
