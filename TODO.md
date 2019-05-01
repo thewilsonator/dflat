@@ -12,7 +12,7 @@
     - GC contention and pinning logic
 * `Instance!("IntPtr")` should be `void*`
 
-# Things to not care about
+# Things to not care about improving
 
 * Math operator overloads
 * GetType
