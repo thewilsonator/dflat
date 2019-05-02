@@ -56,7 +56,7 @@ struct SafeArrayDescriptor
     ushort            fFeatures;
     uint              cbElements;
     uint              cLocks;
-    void*                pvData;
+    void*             pvData;
     union Bound
     {
         SafeArrayBound[1] rgsabound1;
