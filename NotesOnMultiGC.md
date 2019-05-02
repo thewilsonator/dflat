@@ -25,7 +25,7 @@ Tn : a numbered thread
 :| : not sure or caution required
 :) : behaviour is good 
 -> : thread creation
-``
+```
 
 Case 1: A D thread, T2 executes come C# code, meanwhile another D thread triggers a D 
 GC cycle and needs to look at the stackframe of T2. 
@@ -34,14 +34,14 @@ Pointers in the C# stackframes will not be recognised as they haven't been `addR
 ```
 T1: D ----------- {    } -------
 T2: D ---- C# --- |    | -- D --
-``
+```
 
 Case 2: A D thread, T1, runs some C# code that spawns another thread (also running C# code) and resumes to D. The spawned thread, T2, then triggers a C# GC cycle.
 ```
 T1: D ---- C# -- D ---------
            |
 T2:        -> C# ---- { } --
-``
+```
 
 From https://github.com/dotnet/coreclr/blob/master/Documentation/coding-guidelines/clr-code-guide.md
 
