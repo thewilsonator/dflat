@@ -75,8 +75,8 @@ struct SafeArray(T, int dim)
         import core.sys.windows.oleauto;import core.sys.windows.oaidl;
         SafeArrayBound saBound;
         saBound.lLbound = 0;
-        saBound.cElements = arr.length;
-        p = SafeArrayCreate(T2VT!T,1,&saBound);
+        saBound.cElements = cast(uint)arr.length;
+        p = cast(typeof(p))SafeArrayCreate(T2VT!T,1,cast(SAFEARRAYBOUND*)&saBound);
     }
 }
 
