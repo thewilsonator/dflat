@@ -176,7 +176,7 @@ class CLRBuilder
         // @MethodType.static_ t ___ctor( typeof(ci.GetParameters()) args...)
         Type[] tps = ci.GetParameters().Select(p => p.ParameterType).ToArray();
         {
-            MethodBuilder mb = tb.DefineMethod("___ctor", // 3*_ don't collide with D's (2*_) __ctor
+            MethodBuilder mb = tb.DefineMethod("make", // 3*_ don't collide with D's (2*_) __ctor
                                            MethodAttributes.Public |
                                                    MethodAttributes.Static,
                                            t,
@@ -203,7 +203,7 @@ class CLRBuilder
             ilg.Emit(OpCodes.Ret);
         }
         {
-            MethodBuilder mb = tb.DefineMethod("__unpin",
+            MethodBuilder mb = tb.DefineMethod("unpin",
                                            MethodAttributes.Public |
                                                    MethodAttributes.Static,
                                            typeof(void),
@@ -220,7 +220,7 @@ class CLRBuilder
             ilg.Emit(OpCodes.Ret);
         }
         {
-            sw.Write("\t" + toDType(t) + " ___ctor(");
+            sw.Write("\tabstract " + toDType(t) + " make(");
             if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
                 {
                     sw.Write(toDType(pt));
@@ -229,6 +229,8 @@ class CLRBuilder
             if ((tps.Length > 1))
                 sw.Write(toDType(tps[tps.Length - 1]));
             sw.Write(");\n");
+
+            sw.Write("\tabstract void unpin("+ toDType(t)+");\n");
         }
     }
     static string toDType(Type type)
