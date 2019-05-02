@@ -137,7 +137,7 @@ private enum VARENUM {
 
 private template T2VT(T)
 {
-    static if (is((T ==  typeof(null)))
+    static if (is(T ==  typeof(null)))
         enum T2VT = VARENUM.NULL;
     else static if(is(T == int))
         enum T2VT = VARENUM.I4;
