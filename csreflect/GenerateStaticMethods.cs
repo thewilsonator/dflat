@@ -131,8 +131,8 @@ class CLRBuilder
 
         }
         {
-            sw.Write("\t" + toDType(mi.ReturnType) + " " + mi.Name);
-            sw.Write("( ");
+            sw.Write("\tabstract " + toDType(mi.ReturnType) + " " + mi.Name);
+            sw.Write("(");
             if (mi.IsStatic)
             {
                 if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
