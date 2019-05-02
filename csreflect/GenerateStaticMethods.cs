@@ -27,7 +27,7 @@ class CLRBuilder
     void writeHeader()
     {
         sw.Write("module " + fname + ";\n");
-        sw.Write("import dflat.wrap;\n");
+        sw.Write("import dflat.wrap; import dflat.types;\n");
         sw.Write("@DLL(\"" + fname + "\")\n");
 
         sw.Write("{\n");
