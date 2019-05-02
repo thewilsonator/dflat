@@ -72,6 +72,7 @@ struct SafeArray(T, int dim)
     static if (dim == 1)
     this( T[] arr)
     {
+        import core.sys.windows.oleauto;import core.sys.windows.oaidl;
         SafeArrayBound saBound;
         saBound.lLbound = 0;
         saBound.cElements = arr.length;
