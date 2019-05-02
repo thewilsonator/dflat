@@ -146,6 +146,10 @@ private template T2VT(T)
         enum T2VT = VARENUM.VOID;
     else static if (is(T == double))
         enum T2VT = VARENUM.R8;
+    else static if (is(T == ushort))
+        enum T2VT = VARENUM.U2;
+    else static if (is(T == bool))
+        enum T2VT = VARENUM.I1;
     else static if (is(T == struct))
         enum T2VT = VARENUM.USERDEFINED;
 }
