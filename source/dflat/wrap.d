@@ -21,7 +21,7 @@ template how(C,alias fun)
     import std.string : format;
     enum string dll = getUDAs!(C,DLL)[0].dll;
     enum how = q{
-        import %s;
+        import %s;import dflat.types;
         alias func = %s function%s;
         import core.memory : GC;
         import std.stdio : writeln;
