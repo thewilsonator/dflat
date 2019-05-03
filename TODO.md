@@ -7,6 +7,8 @@
         - Need VARENUM otherwise use `core.sys.windows.oleauto`
     - Instances
     - GC contention and pinning logic
+* Build CSreflect as a dub prebuild command
+    - copy the generated files into `test/`
 
 # Things to not care about improving
 
