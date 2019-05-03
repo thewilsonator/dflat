@@ -136,10 +136,10 @@ class CLRBuilder
             if (mi.IsStatic)
             {
                 if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
-                    {
-                        sw.Write(toDType(pt));
-                        sw.Write(", ");
-                    }
+                {
+                    sw.Write(toDType(pt));
+                    sw.Write(", ");
+                }
                 if ((tps.Length > 1))
                     sw.Write(toDType(tps[tps.Length - 1]));
             }
@@ -147,10 +147,10 @@ class CLRBuilder
             {
                 sw.Write(toDType(tps[0])); sw.Write(" ");
                 if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length))
-                    {
-                        sw.Write(", ");
-                        sw.Write(toDType(pt));
-                    }
+                {
+                    sw.Write(", ");
+                    sw.Write(toDType(pt));
+                }
             }
         }
 
