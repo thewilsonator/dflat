@@ -31,7 +31,8 @@ template how(C,alias fun)
         auto f = cast(func)(clrhost.create_delegate("%s",
         %s,
         %s));
-        return f();
+
+        return f(args);
     }.format(
         moduleName!C,
 
