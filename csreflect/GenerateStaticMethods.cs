@@ -252,6 +252,8 @@ class CLRBuilder
             return "double";
         else if (type == typeof(int))
             return "int";
+        else if (type == typeof(ulong))
+            return "ulong";
         else if (type == typeof(string))
             return "CLRAllocatedCString";
         else if (type == typeof(bool))
