@@ -160,13 +160,13 @@ class CLRBuilder
     void addCtor(ConstructorInfo ci)
     {
         //Generate C#
-        // static t ___ctor (typeof(ci.GetParameters()) args...)
+        // static t make (typeof(ci.GetParameters()) args...)
         // {
         //    var ret = new t(args); // DONE
         //    GCHandle gch = GCHandle.Alloc(ret);
         //    return GCHandle.ToIntPtr(gch);
         // }
-        // static void __unpin(IntPtr pthis)
+        // static void unpin(IntPtr pthis)
         //    GCHandle gch = GCHandle.FromIntPtr(pthis);
         //    gch.Free();
         //	  return;
@@ -176,7 +176,7 @@ class CLRBuilder
         // @MethodType.static_ t ___ctor( typeof(ci.GetParameters()) args...)
         Type[] tps = ci.GetParameters().Select(p => p.ParameterType).ToArray();
         {
-            MethodBuilder mb = tb.DefineMethod("make", // 3*_ don't collide with D's (2*_) __ctor
+            MethodBuilder mb = tb.DefineMethod("make",
                                            MethodAttributes.Public |
                                                    MethodAttributes.Static,
                                            t,
