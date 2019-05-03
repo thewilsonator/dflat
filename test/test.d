@@ -1,17 +1,17 @@
 import dflat;
 
-@DLL("manlib")
-abstract class ManLib
+@DLL("mscorlib") @NameSpace("System")
+abstract class Math
 {
-    abstract char* Bootstrap();
+    abstract double Pow (double x, double y);
 }
 
 void main ()
 {
     import std.stdio;
     CLRCore.load();
-    import std.file;
-    string path = getcwd()~"/test/manlib/bin/Debug/netstandard2.0/";
+    import std.file, std.path;
+    auto cwd = getcwd() ~ dirSeparator;
     string ep = thisExePath();
     clrhost = CLRHost(getcwd(),"foo",
                      [
