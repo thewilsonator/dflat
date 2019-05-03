@@ -221,12 +221,12 @@ class CLRBuilder
         }
         {
             sw.Write("\tabstract " + toDType(t) + " make(");
-            if (tps.Length > 1) foreach (Type pt in tps.Skip(1).Take(tps.Length - 2))
-                {
-                    sw.Write(toDType(pt));
-                    sw.Write(", ");
-                }
-            if ((tps.Length > 1))
+            foreach (Type pt in tps.Take(tps.Length - 1))
+            {
+                sw.Write(toDType(pt));
+                sw.Write(", ");
+            }
+            if ((tps.Length > 0))
                 sw.Write(toDType(tps[tps.Length - 1]));
             sw.Write(");\n");
 
