@@ -23,7 +23,8 @@ template how(C,alias fun)
     enum how = q{
         import %s;
         alias func = %s function%s;
-        import core.gc;
+        import core.memory : GC;
+        import std.stdio : writeln;
         // Avoid the GC stopping a running C# thread.
         GC.disable; scope(exit) GC.enable;
 
