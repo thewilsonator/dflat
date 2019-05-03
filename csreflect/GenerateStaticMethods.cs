@@ -36,13 +36,13 @@ class CLRBuilder
     {
         writeHeader();
         AssemblyBuilder ab = AppDomain.CurrentDomain.DefineDynamicAssembly(
-                                       new AssemblyName(fname + "Static"),
+                                       new AssemblyName(fname + "static"),
                                        AssemblyBuilderAccess.Save);
 
         // To avoid duplicately adding types
         HashSet<String> visitedTypes = new HashSet<String>();
 
-        ModuleBuilder mb = ab.DefineDynamicModule(fname, fname + ".static.dll", true);
+        ModuleBuilder mb = ab.DefineDynamicModule(fname + "static.dll", fname + "static.dll", true);
         foreach (Type _ in Assembly.Load(new AssemblyName(fname)).GetExportedTypes())
         {
             t = _;
@@ -51,7 +51,7 @@ class CLRBuilder
             visitedTypes.Add(t.Name);
             //TODO: support namespaces
             sw.Write("abstract class "); sw.Write(t.Name); sw.Write(" {\n");
-            tb = mb.DefineType(t.Name + "Static", TypeAttributes.Public);
+            tb = mb.DefineType(t.Name + "static", TypeAttributes.Public);
             foreach (MemberInfo mi in t.GetMembers())
             {
                 if (mi.Name == "assert")
