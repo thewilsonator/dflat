@@ -32,7 +32,7 @@ string TrustedPlatformAssembliesFiles(string dir = dirName(dflat.bind.libNames))
     import std.array;
     Appender!string ret;
     byte[string] asms;
-    
+
 
     foreach(ex; exts)
     foreach(f;dirEntries(dir,ex, SpanMode.shallow))
@@ -48,7 +48,7 @@ string TrustedPlatformAssembliesFiles(string dir = dirName(dflat.bind.libNames))
             ret.put(pathSeparator);
         }
     }
-    
+
     return ret.data[0 .. $-1]; // remove the last path sep
 }
 
@@ -67,7 +67,7 @@ struct CLRHost
         auto keys = props.keys.map!(toStringz).array;
         auto vals = props.values.map!(toStringz).array;
 
-        coreclr_initialize(exePath.toStringz,
+        auto err = coreclr_initialize(exePath.toStringz,
                            name.toStringz,
                            len,
                            keys.ptr,
@@ -75,23 +75,29 @@ struct CLRHost
                            &handle,
                            &domainId)
             ;
+        if (err)
+        {
+            import std.stdio;
+            writeln("coreclr_initialize error! err =",err);
+            foreach(k,v;props)
+                writeln(k,": ",v);
+        }
     }
     void shutdown()
     {
         coreclr_shutdown(handle, domainId);
     }
-    
+
     int shutdown_2()
     {
         int ret;
         coreclr_shutdown_2(handle, domainId, &ret);
         return ret;
     }
-    
+
     /**
      * entryPointAssemblyName (CLR dynamic library or exectuable)
      * entryPointTypeName class name
-     
      */
     void* create_delegate(string entryPointAssemblyName,
                           string entryPointTypeName,
@@ -99,11 +105,19 @@ struct CLRHost
     {
         void* dg;
 
-        coreclr_create_delegate(handle, domainId,
+        auto err = coreclr_create_delegate(handle, domainId,
                                 entryPointAssemblyName.toStringz,
                                 entryPointTypeName.toStringz,
                                 entryPointMethodName.toStringz,
                                 &dg);
+        if (err)
+        {
+            import std.stdio;
+            writeln("create_delegate error! err =",err);
+            writeln(entryPointAssemblyName);
+            writeln(entryPointTypeName);
+            writeln(entryPointMethodName);
+        }
         return dg;
     }
 }
