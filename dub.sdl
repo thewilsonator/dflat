@@ -11,7 +11,7 @@ configuration "library" {
     sourcePaths "source"
 }
 configuration "unittest" {
+    preBuildCommands "test/build.bat"
     targetType "executable"
-    preBuildCommands "cd test/manlib && dotnet build; cd ../../"
     sourcePaths "source" "test"
 }
