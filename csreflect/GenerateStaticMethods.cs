@@ -230,7 +230,7 @@ class CLRBuilder
                 sw.Write(toDType(tps[tps.Length - 1]));
             sw.Write(");\n");
 
-            sw.Write("\tabstract void unpin("+ toDType(t)+");\n");
+            sw.Write("\tabstract void unpin(" + toDType(t) + ");\n");
         }
     }
     static string toDType(Type type)
