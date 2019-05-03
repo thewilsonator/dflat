@@ -4,7 +4,6 @@ authors "Nicholas Wilson"
 copyright "Copyright © 2019, Nicholas Wilson"
 license "proprietary"
 dependency "derelict-util" version="~>2.1.0"
-libs "coreclr"
 
 configuration "library" {
     targetType "library"
