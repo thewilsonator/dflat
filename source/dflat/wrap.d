@@ -12,7 +12,7 @@ struct DLL
 // ditto
 struct NameSpace
 {
-    string NameSpace;
+    string nameSpace;
 }
 
 template how(C,alias fun)
