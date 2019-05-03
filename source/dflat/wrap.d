@@ -20,6 +20,10 @@ template how(C,alias fun)
     import std.traits;
     import std.string : format;
     enum string dll = getUDAs!(C,DLL)[0].dll;
+    static if (hasUDA!(C,NameSpace))
+        enum ns =  getUDAs!(C,NameSpace)[0].nameSpace ~ ".";
+    else
+        enum ns = "";
     enum how = q{
         import %s;import dflat.types;
         alias func = %s function%s;
@@ -28,8 +32,8 @@ template how(C,alias fun)
         // Avoid the GC stopping a running C# thread.
         GC.disable; scope(exit) GC.enable;
 
-        auto f = cast(func)(clrhost.create_delegate("%s",
-        %s,
+        auto f = cast(func)(clrhost.create_delegate("%sstatic",
+        "%s%sstatic",
         %s));
 
         return f(args);
@@ -41,7 +45,8 @@ template how(C,alias fun)
 
         Parameters!(fun).stringof,
         dll,
-        __traits(identifier, C).stringof,
+        ns,
+        __traits(identifier, C),
         __traits(identifier, fun).stringof);
 }
 
