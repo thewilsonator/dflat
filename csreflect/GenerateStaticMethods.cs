@@ -185,7 +185,7 @@ class CLRBuilder
             MethodBuilder mb = tb.DefineMethod("make",
                                            MethodAttributes.Public |
                                                    MethodAttributes.Static,
-                                           t,
+                                           typeof(IntPtr),
                                            tps
                                            );
             ILGenerator ilg = mb.GetILGenerator();
