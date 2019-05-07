@@ -108,10 +108,7 @@ class CLRBuilder
             ilg.Emit(OpCodes.Nop);
             if (mi.IsStatic)
             {
-                for (byte x = 0; x < tps.Length; x++)
-                {
-                    ilg.Emit(OpCodes.Ldarg_S, x);
-                }
+                emitArgs(ilg,tps);
                 ilg.Emit(OpCodes.Call, mi);
             }
             else
@@ -189,14 +186,13 @@ class CLRBuilder
                                            tps
                                            );
             ILGenerator ilg = mb.GetILGenerator();
-
+            ilg.DeclareLocal(/* ret */t, /* pinned =*/false);
+            ilg.DeclareLocal(/* gch */typeof(GCHandle), /* pinned=*/false);
+            ilg.DeclareLocal(/* gch */typeof(IntPtr), /* pinned =*/false);
             // Copy what ildasm says csc does modulo redundant direct branches
             ilg.Emit(OpCodes.Nop);
 
-            for (byte x = 0; x < tps.Length; x++)
-            {
-                ilg.Emit(OpCodes.Ldarg_S, x);
-            }
+            emitArgs(ilg, tps);
             ilg.Emit(OpCodes.Newobj, ci);
             ilg.Emit(OpCodes.Stloc_0);
             ilg.Emit(OpCodes.Ldloc_0);
@@ -216,11 +212,12 @@ class CLRBuilder
                                            new[] { typeof(IntPtr) }
                                            );
             ILGenerator ilg = mb.GetILGenerator();
+            ilg.DeclareLocal(/* gch */typeof(GCHandle), /* pinned=*/false);
             ilg.Emit(OpCodes.Nop);
             ilg.Emit(OpCodes.Ldarg_0);
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("FromIntPtr"));
             ilg.Emit(OpCodes.Stloc_0);
-            ilg.Emit(OpCodes.Ldloc_0);
+            ilg.Emit(OpCodes.Ldloca_S,0);
             ilg.Emit(OpCodes.Call, typeof(GCHandle).GetMethod("Free"));
             ilg.Emit(OpCodes.Nop);
             ilg.Emit(OpCodes.Ret);
@@ -265,5 +262,21 @@ class CLRBuilder
         else if (type == typeof(bool))
             return "bool";
         return "Instance!(\"" + type.Name + "\")";
+    }
+
+    static void emitArgs(ILGenerator ilg, Type[] tps)
+    {
+        if (tps.Length > 0)
+            ilg.Emit(OpCodes.Ldarg_0);
+        if (tps.Length > 1)
+            ilg.Emit(OpCodes.Ldarg_1);
+        if (tps.Length > 2)
+            ilg.Emit(OpCodes.Ldarg_2);
+        if (tps.Length > 3)
+            ilg.Emit(OpCodes.Ldarg_3);
+        for (byte x = 4; x < tps.Length; x++)
+        {
+            ilg.Emit(OpCodes.Ldarg_S, x);
+        }
     }
 }
