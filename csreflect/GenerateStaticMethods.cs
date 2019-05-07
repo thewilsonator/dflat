@@ -13,15 +13,16 @@ class CLRBuilder
     Type t;          // reflected upon type
     TypeBuilder tb;  // type under construction
     string fname;    // name of file
-
-    CLRBuilder(string name)
+    private string idir;
+    CLRBuilder(string name, string aidir)
     {
         fname = name;
-        sw = new StreamWriter(fname + ".d", false, Encoding.UTF8);
+        idir = aidir;
+        sw = new StreamWriter( fname + ".d", false, Encoding.UTF8);
     }
     static void Main(string[] args)
     {
-        new CLRBuilder(args[0]).run();
+        new CLRBuilder(args[0],args[1]).run();
 
     }
     void writeHeader()
@@ -43,7 +44,7 @@ class CLRBuilder
         HashSet<String> visitedTypes = new HashSet<String>();
 
         ModuleBuilder mb = ab.DefineDynamicModule(fname + "static.dll", fname + "static.dll", true);
-        foreach (Type _ in Assembly.Load(new AssemblyName(fname)).GetExportedTypes())
+        foreach (Type _ in Assembly.LoadFile(Path.GetFullPath(Path.Combine(idir,fname + ".dll"))).GetExportedTypes())
         {
             t = _;
             //Assume that duplicates are identical (e.g. interface / class pairs)
@@ -54,6 +55,9 @@ class CLRBuilder
             tb = mb.DefineType(t.Name + "static", TypeAttributes.Public);
             foreach (MemberInfo mi in t.GetMembers())
             {
+                // Sanity check:
+                // If you think you are missing methods make sure they are public!
+                // Console.WriteLine(mi.Name);
                 if (mi.Name == "assert")
                     continue;
 
@@ -71,7 +75,9 @@ class CLRBuilder
             sw.Write("}\n");
         }
         mb.CreateGlobalFunctions();
-        ab.Save(fname + ".static.dll");
+        // N.B. Cannot save this to anywhere other than cwd
+        // due to Save 
+        ab.Save(fname + "static.dll"); 
         sw.Write("}\n");
         sw.Close();
     }
@@ -160,7 +166,7 @@ class CLRBuilder
     void addCtor(ConstructorInfo ci)
     {
         //Generate C#
-        // static t make (typeof(ci.GetParameters()) args...)
+        // static IntPtr make (typeof(ci.GetParameters()) args...)
         // {
         //    var ret = new t(args); // DONE
         //    GCHandle gch = GCHandle.Alloc(ret);
