@@ -26,3 +26,11 @@ docs/
 test/testlib/bin/Debug/
 test/testlib/obj/Debug/
 
+csreflect/bin/Debug/
+csreflect/obj/Debug/
+
+*.pdb
+*.cache
+
+\.vs
+
