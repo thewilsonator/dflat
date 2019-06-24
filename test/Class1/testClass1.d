@@ -1,25 +1,19 @@
 import dflat;
 
-import ClassLibrary2;
+import class1;
 
-@DLL("mscorlib") @NameSpace("System")
-abstract class Math
-{
-    abstract double Pow (double x, double y);
-}
-
-void main ()
+void main()
 {
     import std.stdio;
     CLRCore.load();
     import std.file, std.path;
     auto cwd = getcwd() ~ dirSeparator;
     string ep = thisExePath();
-    writeln("getcwd() = ",getcwd());
+
     auto tpas = pathcat(TrustedPlatformAssembliesFiles(),
-                        buildPath([cwd, "test", "ClassLibrary2static.dll"]),
-                        buildPath([cwd, "test", "ClassLibrary2.dll"]));
-    writeln(tpas);
+                        buildPath([cwd, "test", "Class1", "Class1static.dll"]),
+                        buildPath([cwd, "test", "Class1", "Class1.dll"]));
+    //writeln(tpas);
     clrhost = CLRHost(getcwd(),"foo",
         [
             TRUSTED_PLATFORM_ASSEMBLIES : tpas,
@@ -30,20 +24,19 @@ void main ()
             SYSTEM_GLOBALISATION_INVARIANT : "false"
         ]);
 
-    writeln("clrhost = ",clrhost);
-
-    /*{
-        auto x = new CLRWrapper!Math;
-        writeln(x.Pow(2.0,4.0));
-    }*/
     {
-        auto a = new CLRWrapper!Class1;
         writeln("here");
+        Class1 a;
+        writeln("here ", a._raw.o.p);
+        a = Class1.make(42);
+        writeln("here ", a._raw.o.p);
         import std.string : fromStringz;
-        auto b = a.make(0); // fails
-        writeln("here2");
-        scope(exit) a.unpin(b);
+        auto s = a.toString();
+        writeln(s.ptr.fromStringz);
+
+        scope(exit) a.unpin();
     }
+
     clrhost.shutdown();
 }
 
