@@ -2,7 +2,11 @@ module dflat.types;
 
 
 // We "Marshall" C# object types as the GCHandle void*
-struct DotNetObject { void * p; }
+struct DotNetObject
+{
+    void * p;
+    alias p this;
+}
 // For objects
 struct Instance(string fullClsName)
 {
