@@ -36,3 +36,6 @@ mixinout.d
 
 \.vs
 
+test/*.json
+test/*.il
+*.user
