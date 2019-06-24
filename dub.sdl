@@ -12,5 +12,6 @@ configuration "library" {
 }
 configuration "unittest" {
     targetType "executable"
-    sourcePaths "source" "test"
+    sourcePaths "source"
+    sourceFiles "test/main.d"
 }
