@@ -383,7 +383,7 @@ class CLRBuilder
         else if (type == typeof(ulong))
             return "ulong";
         else if (type == typeof(string))
-            return "CLRAllocatedCString";
+            return "const(char)*";
         else if (type == typeof(bool))
             return "bool";
         return "Instance!(\"" + type.Name + "\")";

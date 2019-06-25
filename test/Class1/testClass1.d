@@ -33,7 +33,7 @@ void main()
         writeln("`a` raw pointer: ", a._raw.o.p);
 
         auto s = a.toString();
-        writeln(s.ptr.fromStringz);
+        writeln(s.fromStringz);
 
         scope(exit) a.unpin();
     }
