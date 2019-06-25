@@ -42,25 +42,32 @@ int main(string[] args)
         //Compile the C# source - generate foo.dll
         const name = d.name["test/".length .. $];
         const file = d.name ~ "/" ~ name;
-        exec([monoDir ~ "bin/csc", "/t:library", file ~ ".cs","/out:" ~ file~".dll"]);
+        if (exec([monoDir ~ "bin/csc", "/t:library", file ~ ".cs","/out:" ~ file~".dll"]).status)
+            break;
+
         //Reflect on generated .dll - generate foostatic.dll and foo.d
-        exec(["dotnet", asAbsolutePath("test/csreflect.exe").array, name, "test/"]);
+        if (exec(["dotnet", asAbsolutePath("test/csreflect.exe").array, name, "test/"]).status)
+            break;
         
         //Compile foo.d testfoo.d
         const dcompiler = args.length == 5 ? args[4] : "dmd";
 
-        exec([dcompiler,
+        if(exec([dcompiler,
               "-I" ~ asAbsolutePath("source").array,
               "-I" ~ asAbsolutePath(derelictUtilDir).array,
               d.name ~ "/" ~ cast(char)name[0].toLower() ~ name[1 .. $ ]~ ".d",
+              "test/"~ name ~ "/test"~ name ~ ".d",
               "-i",
-              "test/"~ name ~ "/test"~ name ~ ".d"
-             ]);
+              //"-o-",
+              "-of=" ~name
+             ]).status)
+            break;
+        writeln("Executing test ", name);
         auto pid = exec(["./"~name]);
         ret |= pid.status;
-        if (pid.status != 0)
+        //if (pid.status != 0)
         {
-            writeln("Test", d.name, " Failed\n", pid.output);
+            writeln("Test ", name, " Failed\n", pid.output);
             //Disassemble the .dll's
             const dasm = monoDir ~ "bin/ikdasm";
             // don't use -out= it doens't appear to work
