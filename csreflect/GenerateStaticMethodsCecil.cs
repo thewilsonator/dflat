@@ -205,7 +205,12 @@ class CLRBuilder
         log("mi.Name = " + mi.Name);
         string methname;
         if (mi.Name == "ToString")
+        {
+            //Don't create two methods with the same name
+            if (t.GetMethod("toString") != null)
+                return;
             methname = "toString";
+        }
         else if (mi.Name == "GetType")
         {
             
