@@ -29,12 +29,11 @@ void main()
         writeln("here");
         Class1 a;
         writeln("`a` raw pointer: ", a._raw.o.p);
-        a = Class1.make(42);
+        a = Class1.make(314);
         writeln("`a` raw pointer: ", a._raw.o.p);
-
-        auto s = a.toString();
-        writeln(s.fromStringz);
-
+        writeln(a.toString().fromStringz);
+        a.foo();
+        writeln(a.toString().fromStringz);
         scope(exit) a.unpin();
     }
 
