@@ -274,8 +274,9 @@ class CLRBuilder
         //Generate C#
         // static IntPtr make (typeof(ci.GetParameters()) args...)
         // {
-        //    var ret = new t(args); // DONE
-        //    GCHandle gch = GCHandle.Alloc(ret);
+        //    var ret = new t(args);
+        //    Object o = (Object)ret;
+        //    GCHandle gch = GCHandle.Alloc(o);
         //    return GCHandle.ToIntPtr(gch);
         // }
         // static void unpin(IntPtr pthis)
@@ -302,7 +303,7 @@ class CLRBuilder
                 mb.Parameters.Add(new ParameterDefinition(md.ImportReference(_t)));
 
             var ilg = mb.Body.GetILProcessor();
-            newVar(mb, t);
+            newVar(mb, typeof(Object));
             newVar(mb, typeof(GCHandle));
             newVar(mb, typeof(IntPtr));
             // Copy what ildasm says csc does modulo redundant direct branches
