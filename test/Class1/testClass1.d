@@ -25,12 +25,13 @@ void main()
         ]);
 
     {
+        import std.string : fromStringz;
         writeln("here");
         Class1 a;
-        writeln("here ", a._raw.o.p);
+        writeln("`a` raw pointer: ", a._raw.o.p);
         a = Class1.make(42);
-        writeln("here ", a._raw.o.p);
-        import std.string : fromStringz;
+        writeln("`a` raw pointer: ", a._raw.o.p);
+
         auto s = a.toString();
         writeln(s.ptr.fromStringz);
 
