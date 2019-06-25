@@ -142,7 +142,7 @@ class CLRBuilder
         }
         sw.Write(")");
 	}
-    void writeDMethod(bool isStatic,string retTy,string name, Type[] tps)
+    void writeDMethod(bool isStatic,string retTy,string name, Type[] tps, string altName = null)
     {
         sw.Write("    ");
     	if (useCls)
@@ -161,15 +161,17 @@ class CLRBuilder
         }
         sw.Write("\n    {\n");
         
-        sw.Write("        alias func = extern(C) " + retTy + " function");
-        writeMethParams(isStatic,isStatic ? "" : "typeof(_raw)",tps); sw.Write(";\n");
+        sw.Write("        alias func = extern(C) " + ((altName != null) ? altName : retTy) + " function");
+        writeMethParams(isStatic,isStatic ? "" : "void*",tps); sw.Write(";\n");
 
         sw.Write("        // Avoid the GC stopping a running C# thread.\n");
         sw.Write("        GC.disable; scope(exit) GC.enable;\n");
         sw.Write("        auto f = cast(func)(clrhost.create_delegate(\"" + fname + "static\",");
-
         sw.Write("\"" + t.Namespace + (t.Namespace == null ? "" : ".") + t.Name + "static\", \"" + name + "\"));\n");
-		sw.Write("        return f(");
+        if (retTy == "void")
+            sw.Write("        return f(");
+        else
+            sw.Write("        auto ret = f(");
         if (!isStatic)
         {
             sw.Write("_raw" + ((tps.Length >= 1)? ", " : ""));
@@ -184,6 +186,8 @@ class CLRBuilder
             sw.Write("_param_" + (tps.Length-1).ToString());
         }
         sw.Write(");\n");
+        if (retTy != "void")
+            sw.Write("        return *cast("+retTy+"*)&ret;\n");
         sw.Write("    }\n\n");
     }
 
@@ -294,7 +298,7 @@ class CLRBuilder
         // @MethodType.static_ t ___ctor( typeof(ci.GetParameters()) args...)
         Type[] tps = ci.GetParameters().Select(p => p.ParameterType).ToArray();
         
-        writeDMethod(true,  t.Name, "make",  tps);
+        writeDMethod(true,  t.Name, "make",  tps, "void*");
         writeDMethod(false, "void", "unpin", new Type[]{});
 
         {
