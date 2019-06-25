@@ -213,7 +213,7 @@ class CLRBuilder
             return;
         }
         else methname = mi.Name;
-        log("methname = " + methname);
+
         var mb = new MethodDefinition(methname,
                                    Mono.Cecil.MethodAttributes.Public |
                                        Mono.Cecil.MethodAttributes.Static,
