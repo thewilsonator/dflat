@@ -10,7 +10,7 @@ import std.uni;
 auto exec(const(char[])[] args, int line = __LINE__)
 {
     auto ret = execute(args);
-    if (ret.status != 0 || line > 69)
+    if (ret.status != 0)
         writeln(line, ":" ,args);
     return ret;
 }
