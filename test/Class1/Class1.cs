@@ -9,6 +9,11 @@ public class Class1
     public Class1(int aa) { a = aa; }
     public void foo() { a = 42; }
     public override string ToString() { return a.ToString(); }
+    public int bar
+    {
+        get { return a; }
+        set { a = value; }
+    }
 }
 
 public class Class2
@@ -19,14 +24,17 @@ public class Class2
         GCHandle gch = GCHandle.Alloc(ret);
         return GCHandle.ToIntPtr(gch);
     }
-
-    public static string toString(IntPtr pthis)
+    private static Class1 _get(IntPtr pthis)
     {
         //System.Console.WriteLine(pthis.ToString("X"));
         var gch = GCHandle.FromIntPtr(pthis);
         var targ = gch.Target;
         //System.Console.WriteLine(().ToString());
-        Class1 actual = (Class1)targ;
+        return (Class1)targ;
+    }
+    public static string toString(IntPtr pthis)
+    {
+        Class1 actual = _get(pthis);
         return actual.ToString();
     }
     public static void unpin(IntPtr pthis)
@@ -40,6 +48,18 @@ public class Class2
         var a = Class2.make(42);
         string s = toString(a);
         Class2.unpin(a);
+    }
+    
+    static void barSet(IntPtr pthis, int a)
+    {
+        Class1 actual = _get(pthis);
+        actual.bar = a;
+    }
+    
+    static int barGet(IntPtr pthis)
+    {
+        Class1 actual = _get(pthis);
+        return actual.bar;
     }
 }
 

@@ -104,7 +104,7 @@ class CLRBuilder
                     addCtor((ConstructorInfo)mi);
                 else if (mi.MemberType == MemberTypes.Property)
                 {
-                    // TODO
+                    // Already handled with addMethod above
                 }
             }
             
@@ -142,15 +142,18 @@ class CLRBuilder
         }
         sw.Write(")");
 	}
-    void writeDMethod(bool isStatic,string retTy,string name, Type[] tps, string altName = null)
+    void writeDMethod(bool isStatic, bool prop,string retTy,string name, Type[] tps, string altName = null)
     {
         sw.Write("    ");
     	if (useCls)
         	sw.Write("abstract ");
         if (isStatic && !useCls)
             sw.Write("static ");
+        if (prop)
+            sw.Write("@property ");
         
-        sw.Write(retTy + " " + name);
+        string methName = (prop) ? name.Substring("get_".Length) : name;
+        sw.Write(retTy + " " + methName);
 
         writeMethParams(isStatic,"",tps);
  
@@ -201,6 +204,7 @@ class CLRBuilder
 
         // Need to treat differently
         //	ToString Equals GetHashCode & GetType
+        bool isProp = mi.Name.StartsWith("get_") || mi.Name.StartsWith("set_");
 
         List<Type> tl = new List<Type>();
         //tl.Insert(0, t);
@@ -222,7 +226,7 @@ class CLRBuilder
             return;
         }
         else methname = mi.Name;
-
+        log("mi.Name = " + mi.Name);
         var mb = new MethodDefinition(methname,
                                    Mono.Cecil.MethodAttributes.Public |
                                        Mono.Cecil.MethodAttributes.Static,
@@ -232,7 +236,7 @@ class CLRBuilder
         {
             mb.Parameters.Add(new ParameterDefinition(md.ImportReference(_t)));
         }
-        writeDMethod(mi.IsStatic, toDType(mi.ReturnType), methname, tps);
+        writeDMethod(mi.IsStatic, isProp, toDType(mi.ReturnType), methname, tps);
 
         {
             var ilg = mb.Body.GetILProcessor();
@@ -298,8 +302,8 @@ class CLRBuilder
         // @MethodType.static_ t ___ctor( typeof(ci.GetParameters()) args...)
         Type[] tps = ci.GetParameters().Select(p => p.ParameterType).ToArray();
         
-        writeDMethod(true,  t.Name, "make",  tps, "void*");
-        writeDMethod(false, "void", "unpin", new Type[]{});
+        writeDMethod(true,  false, t.Name, "make",  tps, "void*");
+        writeDMethod(false, false, "void", "unpin", new Type[]{});
 
         {
             log("here");

@@ -34,6 +34,9 @@ void main()
         writeln(a.toString().fromStringz);
         a.foo();
         writeln(a.toString().fromStringz);
+        writeln(a.bar);
+        a.bar = 42;
+        writeln(a.bar);
         scope(exit) a.unpin();
     }
 
