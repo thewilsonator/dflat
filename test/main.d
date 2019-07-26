@@ -10,7 +10,7 @@ import std.uni;
 auto exec(const(char[])[] args, int line = __LINE__)
 {
     auto ret = execute(args);
-    if (ret.status != 0)
+    //if (ret.status != 0)
         writeln(line, ":" ,args);
     return ret;
 }
@@ -47,7 +47,12 @@ int main(string[] args)
             break;
 
         //Reflect on generated .dll - generate foostatic.dll and foo.d
-        if (exec(["dotnet", asAbsolutePath("test/csreflect.exe").array, name, UnitTestDir]).status)
+        if (exec(["dotnet",
+                  asAbsolutePath("test/csreflect.exe").array,
+                  name,
+                  UnitTestDir, // input  dir
+                  d.name ~ "/" // output dir
+                  ]).status)
             break;
         
         //Compile foo.d testfoo.d

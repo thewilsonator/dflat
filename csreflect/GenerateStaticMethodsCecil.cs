@@ -18,18 +18,23 @@ class CLRBuilder
     TypeDefinition tb;  // type under construction
     string fname;    // name of file
     private string idir;
+    private string odir;
     ModuleDefinition md;
     bool useCls;
-    CLRBuilder(string name, string aidir)
+    CLRBuilder(string name, string aidir, string aodir)
     {
         fname = name;
         idir = aidir;
-        sw = new StreamWriter(idir+ "/"+fname+"/"+fname.ToLower() + ".d", false, Encoding.UTF8);
+        odir = (aodir == null) ? aidir : aodir;
+        sw = new StreamWriter(odir +fname.ToLower() + ".d", false, Encoding.UTF8);
         useCls = false;
     }
     static void Main(string[] args)
     {
-        new CLRBuilder(args[0],args[1]).run();
+        if (args.Length == 2)
+            new CLRBuilder(args[0],args[1], null).run();
+        else
+            new CLRBuilder(args[0],args[1],args[2]).run();
     }
     
     static void log(string s)
@@ -112,7 +117,7 @@ class CLRBuilder
             sw.Write("}\n");
         }
 
-        md.Write(idir+ "/"+fname+"/"+fname + "static.dll");
+        md.Write(odir + "/" + fname + "static.dll");
         sw.Close();
     }
 
