@@ -37,5 +37,5 @@ mixinout.d
 \.vs
 
 test/*.json
-test/*.il
+*.il
 *.user
