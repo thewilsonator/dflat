@@ -37,16 +37,17 @@ int main(string[] args)
     }
     
     int ret;
-    foreach(d; dirEntries("test", SpanMode.shallow).filter!(d=>d.isDir))
+    enum UnitTestDir = "test/unit/";
+    foreach(d; dirEntries(UnitTestDir, SpanMode.shallow).filter!(d=>d.isDir))
     {
         //Compile the C# source - generate foo.dll
-        const name = d.name["test/".length .. $];
+        const name = d.name[UnitTestDir.length .. $];
         const file = d.name ~ "/" ~ name;
         if (exec([monoDir ~ "bin/csc", "/t:library", file ~ ".cs","/out:" ~ file~".dll"]).status)
             break;
 
         //Reflect on generated .dll - generate foostatic.dll and foo.d
-        if (exec(["dotnet", asAbsolutePath("test/csreflect.exe").array, name, "test/"]).status)
+        if (exec(["dotnet", asAbsolutePath("test/csreflect.exe").array, name, UnitTestDir]).status)
             break;
         
         //Compile foo.d testfoo.d
@@ -56,16 +57,16 @@ int main(string[] args)
               "-I" ~ asAbsolutePath("source").array,
               "-I" ~ asAbsolutePath(derelictUtilDir).array,
               d.name ~ "/" ~ cast(char)name[0].toLower() ~ name[1 .. $ ]~ ".d",
-              "test/"~ name ~ "/test"~ name ~ ".d",
+              UnitTestDir ~ name ~ "/test"~ name ~ ".d",
               "-i",
               //"-o-",
-              "-of=" ~name
+              "-of=" ~ name
              ]).status)
             break;
         writeln("Executing test ", name);
         auto pid = exec(["./"~name]);
         ret |= pid.status;
-        //if (pid.status != 0)
+        if (pid.status != 0)
         {
             writeln("Test ", name, " Failed\n", pid.output);
             //Disassemble the .dll's

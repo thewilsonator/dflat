@@ -11,8 +11,8 @@ void main()
     string ep = thisExePath();
 
     auto tpas = pathcat(TrustedPlatformAssembliesFiles(),
-                        buildPath([cwd, "test", "Class1", "Class1static.dll"]),
-                        buildPath([cwd, "test", "Class1", "Class1.dll"]));
+                        buildPath([cwd, "test", "unit", "Class1", "Class1static.dll"]),
+                        buildPath([cwd, "test", "unit", "Class1", "Class1.dll"]));
     //writeln(tpas);
     clrhost = CLRHost(getcwd(),"foo",
         [
