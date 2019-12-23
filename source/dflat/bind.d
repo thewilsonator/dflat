@@ -7,7 +7,7 @@ public
     import derelict.util.system;
     
     static if(Derelict_OS_Windows)
-        enum libNames = "coreclr.dll"; // A guess
+        enum libNames = `C:\Program Files (x86)\dotnet\shared\Microsoft.NETCore.App\3.1.0\coreclr.dll`;
     else static if (Derelict_OS_Mac)
         enum libNames = "/usr/local/share/dotnet/shared/Microsoft.NETCore.App/2.2.3/libcoreclr.dylib";
     else static if (Derelict_OS_Linux)
