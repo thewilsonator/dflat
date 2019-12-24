@@ -43,3 +43,5 @@ test/csreflect.*
 
 # Specific generated files
 test/unit/Class1/class1.d
+
+/DerelictUtil

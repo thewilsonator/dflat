@@ -1,3 +1,4 @@
+import std.getopt;
 import std.process;
 import std.format;
 import std.stdio;
@@ -7,13 +8,6 @@ import std.file;
 import std.path;
 import std.array;
 import std.uni;
-
-auto monoTool(string monoDir, string toolName)
-{
-    version (Windows)
-        toolName = toolName ~ ".bat";
-    return buildPath(monoDir, "bin", toolName);
-}
 
 auto tryExec(scope const(char[])[] args)
 {
@@ -39,11 +33,6 @@ auto repoPath(T...)(T args)
 
 class AlreadyReportedException : Exception { this() { super("error already reported"); } }
 
-void usage()
-{
-    writefln("Usage: main <mono-dir> <cecil-dir> <derelict-util-dir> [<d-compiler>]");
-}
-
 int main(string[] args)
 {
     try { return main2(args); }
@@ -51,36 +40,104 @@ int main(string[] args)
 }
 int main2(string[] args)
 {
-    args = args[1 .. $];
-    if (args.length == 0)
+    string dcompiler = null;
+    string dotnetCompiler = null;
+    string dotnetLoader = null;
+    string derelictUtilDir = null;
+    auto getoptResult = getopt(args,
+        "d-compiler", "the d-compiler to use", &dcompiler,
+        "dotnet-compiler", "the .NET compiler", &dotnetCompiler,
+        "dotnet-loader", "the .NET runtime loader", &dotnetLoader,
+        "derelict-util", "the derelict-util dir", &derelictUtilDir,
+    );
+    int usage()
     {
-        usage();
+        defaultGetoptPrinter("Usage: main.d <cecil-dir>",
+            getoptResult.options);
         return 1;
     }
 
-    if (args.length < 3)
+    if (getoptResult.helpWanted)
+        return usage();
+
+    args = args[1 .. $];
+    if (args.length == 0)
+        return usage();
+
+    if (args.length < 1)
     {
         writefln("Error: not enough command-line arguments");
         return 1;
     }
-    const monoDir  = args[0];
-    const cecilDir = args[1];
-    const derelictUtilDir = args[2];
-    const dcompiler = which(args.length >= 4 ? args[3] : "dmd");
-
-    const cscExe = monoTool(monoDir, "csc");
-    if (!cscExe.exists())
-    {
-        writefln("Error: invalid mono dir '%s', '%s' does not exist", monoDir, cscExe);
-        return 1;
-    }
+    const cecilDir = args[0];
 
     // TODO: generate a project file for the GenerateStaticMethodsCecil tool
     //       write another tool for generating projects
     const monoCecilDll = buildPath(cecilDir, "net40", "Mono.Cecil.dll");
+    if (!exists(monoCecilDll))
+    {
+        writefln("Error: invalid cecil-dir '%s', '%s' does not exist", cecilDir, monoCecilDll);
+        return 1;
+    }
+
+    if (dcompiler is null)
+        dcompiler = which("dmd");
+
+    if (dotnetCompiler is null)
+    {
+        dotnetCompiler = which("csc");
+        if (dotnetCompiler is null)
+        {
+            writefln("cannot find 'csc' in PATH, provide it with --dotnet-compiler");
+            return 1;
+        }
+    }
+
+    string[] dotnetLoaderArgs;
+    if (dotnetLoader !is null)
+        dotnetLoaderArgs = [dotnetLoader];
+    else
+    {
+        version (Windows) { } else
+        {
+            const dotnet = which("dotnet");
+            if (dotnet !is null)
+                dotnetLoaderArgs = [dotnet];
+            else
+            {
+                const mono = which("mono");
+                if (mono !is null)
+                    dotnetLoaderArgs = [mono];
+                else
+                {
+                    writefln("Error: neither 'dotnet' nor 'mono' are in PATH to run .NET programs");
+                    return 1;
+                }
+            }
+        }
+    }
+
+    if (derelictUtilDir is null)
+    {
+        derelictUtilDir = repoPath("DerelictUtil");
+        if (!exists(derelictUtilDir))
+        {
+            const derelictTmp = derelictUtilDir ~ ".cloning";
+            if (exists(derelictTmp))
+                rmdirRecurse(derelictTmp);
+            mkdir(derelictTmp);
+            exec(["git", "-C", derelictTmp, "init"]);
+            exec(["git", "-C", derelictTmp, "remote", "add", "origin", "https://github.com/DerelictOrg/DerelictUtil"]);
+            const release = "v3.0.0-beta.2";
+            exec(["git", "-C", derelictTmp, "fetch", "origin", release]);
+            exec(["git", "-C", derelictTmp, "reset", "--hard", "FETCH_HEAD"]);
+            rename(derelictTmp, derelictUtilDir);
+        }
+    }
+
     const csreflectExe = repoPath("test", "csreflect.exe");
     exec([
-              cscExe,
+              dotnetCompiler,
               "/reference:Mono.CompilerServices.SymbolWriter.dll",
               //"/reference:" ~ buildPath(cecilDir, "net_4_0_Debug", "Mono.Cecil.dll"),
               "/reference:" ~ monoCecilDll,
@@ -88,11 +145,11 @@ int main2(string[] args)
               "/out:" ~ csreflectExe
     ]);
     // Copy the monoCecilDll to the same output directory so csreflect can find it at runtime
+    // TODO: probably use app.config instead of copying the dll
     copy(monoCecilDll, csreflectExe.dirName.buildPath(monoCecilDll.baseName));
 
     runtimeConfigJson(cecilDir).writeTo(repoPath("test", "csreflect.runtimeconfig.json"));
-    depsJson(cecilDir,monoDir).writeTo(repoPath("test", "csreflect.deps.json"));
-
+    depsJson(cecilDir, dotnetCompiler.dirName.dirName).writeTo(repoPath("test", "csreflect.deps.json"));
 
     int testEntries = 0;
     int testsPassed = 0;
@@ -108,15 +165,11 @@ int main2(string[] args)
         const testDll = filePrefix ~ ".dll";
 
         //Compile the C# source - generate foo.dll
-        if (tryExec([cscExe, "/t:library", filePrefix ~ ".cs","/out:" ~ testDll]).status)
+        if (tryExec([dotnetCompiler, "/t:library", filePrefix ~ ".cs","/out:" ~ testDll]).status)
             continue;
 
         //Reflect on generated .dll - generate foostatic.dll and foo.d
-        string[] dotNetArgs;
-        version (Windows) { } else {
-            dotNetArgs = ["dotnet"];
-        }
-        if (tryExec(dotNetArgs ~ [
+        if (tryExec(dotnetLoaderArgs ~ [
                   csreflectExe.absolutePath,
                   name,
                   unitTestDir, // input  dir
@@ -132,8 +185,8 @@ int main2(string[] args)
         if(tryExec([dcompiler,
               "-g", "-debug",
               "-I" ~ repoPath("source"),
-              "-I" ~ absolutePath(derelictUtilDir),
-              buildPath(d.name, cast(char)name[0].toLower() ~ name[1 .. $ ]~ ".d"),
+              "-I" ~ absolutePath(buildPath(derelictUtilDir, "source")),
+              buildPath(d.name, name[0 .. $ ].toLower() ~ ".d"),
               buildPath(unitTestDir, name, "test" ~ name ~ ".d"),
               "-i",
               //"-o-",
@@ -146,7 +199,7 @@ int main2(string[] args)
             writeln("Test ", name, " Failed");
             //Disassemble the .dll's
             // don't use -out= it doens't appear to work
-            const ikdasmExe = monoTool(monoDir, "ikdasm");
+            const ikdasmExe = buildPath(dotnetCompiler.dirName, "ikdasm").monoToolFilename;
             tryExec([ikdasmExe, testDll,      ]).output.writeTo(d.name~".il");
             tryExec([ikdasmExe, filePrefix ~ "static.dll" ]).output.writeTo(d.name~"static.il");
             continue;
@@ -231,12 +284,27 @@ q{
 }.format(cecilDir,monoDir);
 }
 
+T emptyToNull(T)(T s)
+{
+    return s.length == 0 ? null : s;
+}
+
 auto which(string program)
 {
     if (program.canFind("/", "\\"))
         return program;
     version(Windows)
-        return ["where", program].execute.output.lineSplitter.front;
+        return ["where", program].execute.output.lineSplitter.front.stripRight.emptyToNull;
     else
-        return ["which", program].execute.output;
+    {
+        const result = execute(["which", program]);
+        return result.status == 0 ? result.output.stripRight.emptyToNull : null;
+    }
+}
+
+auto monoToolFilename(string toolName)
+{
+    version (Windows)
+        return toolName ~ ".bat";
+    return toolName;
 }
